@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+
+<StackPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="trivia.TriviaController">
+
+    <AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass">
+
+        <!-- Panel de registro de usuario -->
+        <VBox fx:id="registerPanel" alignment="CENTER" layoutX="192.0" layoutY="35.0" prefHeight="341.0" prefWidth="213.0" spacing="10" styleClass="registerPanel">
+            <Label text="Registro de Usuario" />
+            <ImageView fitHeight="108.0" fitWidth="138.0" pickOnBounds="true" preserveRatio="true">
+                <image>
+                    <Image url="@iconne.jpg" />
+                </image>
+            </ImageView>
+            <Label text="Nombre de usuario:" />
+            <TextField fx:id="usernameField" prefHeight="24.0" prefWidth="526.0" />
+            <Label text="Contraseña:" />
+            <PasswordField fx:id="passwordField" prefHeight="25.0" prefWidth="363.0" />
+            <Button minHeight="0.0" onAction="#handleRegisterButton" prefHeight="78.0" prefWidth="189.0" text="Registrarse" />
+        </VBox>
+
+        <!-- Panel de selección de temas -->
+        <VBox fx:id="themePanel" alignment="CENTER" layoutY="61.0" prefHeight="258.0" prefWidth="695.0" spacing="10" visible="false">
+            <ImageView fitHeight="115.0" fitWidth="281.0" pickOnBounds="true" preserveRatio="true">
+                <image>
+                    <Image url="@cultutageneral.jpg" />
+                </image>
+            </ImageView>
+            <Label text="Seleccione un tema:" />
+            <Button onAction="#handleThemeButton" text="Cultura" />
+            <Button onAction="#handleThemeButton" text="Deportes" />
+            <Button onAction="#handleThemeButton" text="Historia" />
+            <Button onAction="#handleBackButton" text="Atrás" />
+            <Button onAction="#handleExitButton" text="Salir" />
+        </VBox>
+
+        <!-- Panel de preguntas -->
+        <VBox fx:id="questionPanel" alignment="CENTER_LEFT" layoutX="151.0" layoutY="65.0" prefHeight="253.0" prefWidth="507.0" spacing="10" visible="false">
+            <Label fx:id="questionLabel" prefHeight="39.0" prefWidth="537.0" textAlignment="CENTER" />
+            <Label fx:id="timerLabel" prefHeight="18.0" prefWidth="179.0" text="Tiempo restante: " textAlignment="RIGHT" />
+            <Label fx:id="remainingTimeLabel" prefHeight="18.0" prefWidth="179.0" textAlignment="CENTER" />
+            <VBox styleClass="answer-box">
+                <RadioButton fx:id="answer1RadioButton" />
+                <RadioButton fx:id="answer2RadioButton" />
+                <RadioButton fx:id="answer3RadioButton" />
+                <RadioButton fx:id="answer4RadioButton" />
+            </VBox>
+            <HBox alignment="CENTER" spacing="10">
+                <Button onAction="#handleBackButton" text="Atrás" textAlignment="CENTER" />
+                <Button onAction="#handleExitButton" text="Salir" textAlignment="CENTER" />
+                <Button onAction="#handleNextButton" text="Siguiente" textAlignment="CENTER" />
+            </HBox>
+        </VBox>
+
+        <Label fx:id="scoreLabel" layoutX="408.0" layoutY="355.0" prefHeight="18.0" prefWidth="173.0" />
+
+        <!-- Estilos CSS -->
+        <stylesheets>
+         
+        </stylesheets> 
+    </AnchorPane>
+</StackPane>
+

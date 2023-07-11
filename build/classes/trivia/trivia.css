@@ -1,0 +1,57 @@
+.mainFxmlClass {
+    /* Estilos para el panel principal */
+    -fx-background-color: #f0f0f0;
+}
+
+#registerPanel {
+    /* Estilos para el panel de registro de usuario */
+    -fx-background-color: #ffffff;
+    -fx-padding: 10;
+    -fx-spacing: 10;
+}
+
+.themePanel {
+    /* Estilos para el panel de selección de temas */
+    -fx-background-color: #ffffff;
+    -fx-padding: 10;
+    -fx-spacing: 10;
+}
+
+.questionPanel {
+    /* Estilos para el panel de preguntas */
+    -fx-background-color: #ffffff;
+    -fx-padding: 10;
+    -fx-spacing: 10;
+}
+
+.questionLabel {
+    /* Estilos para la etiqueta de pregunta */
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.timerLabel {
+    /* Estilos para la etiqueta de tiempo restante */
+    -fx-font-size: 14px;
+}
+
+.remainingTimeLabel {
+    /* Estilos para la etiqueta de tiempo restante */
+    -fx-font-size: 14px;
+}
+
+.scoreLabel {
+    /* Estilos para la etiqueta de puntuación */
+    -fx-font-size: 14px;
+}
+
+.questionPanel .radio-box {
+    /* Alinea los RadioButtons a la izquierda */
+    -fx-alignment: top-left;
+}
+
+.questionPanel .radio-box .radio-button {
+    /* Alinea los RadioButtons verticalmente */
+    -fx-alignment: center-left;
+    -fx-padding: 5 0 0 0; /* Ajusta el relleno para separar los RadioButtons */
+}

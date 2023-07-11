@@ -1,0 +1,260 @@
+package trivia;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import java.io.IOException;
+import javafx.event.ActionEvent;
+import javafx.scene.control.*;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.ResourceBundle;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.VBox;
+import java.util.Optional;
+import okhttp3.*;
+import java.io.IOException;
+import java.net.URL;
+import java.util.*;
+
+
+//
+
+public class TriviaController implements Initializable {
+
+    @FXML
+    private VBox registerPanel;
+
+    @FXML
+    private VBox themePanel;
+
+    @FXML
+    private VBox questionPanel;
+
+    @FXML
+    private TextField usernameField;
+
+    @FXML
+    private Label questionLabel;
+
+    @FXML
+    private Label scoreLabel;
+
+    @FXML
+    private RadioButton answer1RadioButton;
+
+    @FXML
+    private RadioButton answer2RadioButton;
+
+    @FXML
+    private RadioButton answer3RadioButton;
+
+    @FXML
+    private RadioButton answer4RadioButton;
+
+    private int score;
+    private String currentTheme;
+    private int currentQuestionIndex;
+    private Map<String, List<String[]>> questionsByTheme;
+    private String selectedTheme;
+    private List<String> answerOptions;
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        score = 0;
+
+        questionsByTheme = new HashMap<>();
+        questionsByTheme.put("Cultura", Arrays.asList(
+                new String[]{"¿En qué año ocurrió la Revolución Francesa?", "1789"},
+                new String[]{"¿Cuál es el autor de la obra 'Don Quijote de la Mancha'?", "Miguel de Cervantes"},
+                new String[]{"¿Cuál es la capital de Australia?", "Canberra"},
+                new String[]{"¿Cual es el autor de el libro Su Santidad Pecadora?", "Martín Sacristán Tordesillas"}
+        ));
+        questionsByTheme.put("Deportes", Arrays.asList(
+                new String[]{"¿En qué deporte de elite se utiliza una raqueta para golpear una pelota?", "Tenis"},
+                new String[]{"¿Cuál es el país de origen del fútbol?", "Inglaterra"},
+                new String[]{"¿Cuál es el jugador de baloncesto con más campeonatos de la NBA?", "Michael Jordan"},
+                new String[]{"¿Donde nacio el jugador que le decian El Rey Pele?", "Brasil"},
+                new String[]{"¿Cuándo se celebró el primer mundial de fútbol?", "1930"},
+                new String[]{"¿Quién ganó el mundial de fútbol de 2010?", "España"},
+                new String[]{"¿Qué revista concede el Balón de Oro?", "La revista France Football"}
+        ));
+        questionsByTheme.put("Historia", Arrays.asList(
+                new String[]{"¿En qué año se descubrió América?", "1492"},
+                new String[]{"¿Cuál fue el primer presidente de Estados Unidos?", "George Washington"},
+                new String[]{"¿Quién fue el líder de la Revolución Rusa en 1917?", "Vladimir Lenin"}
+        ));
+
+        ToggleGroup answerGroup = new ToggleGroup();
+        answer1RadioButton.setToggleGroup(answerGroup);
+        answer2RadioButton.setToggleGroup(answerGroup);
+        answer3RadioButton.setToggleGroup(answerGroup);
+        answer4RadioButton.setToggleGroup(answerGroup);
+    }
+
+    @FXML
+    private void handleRegisterButton(ActionEvent event) {
+        registerPanel.setVisible(false);
+        themePanel.setVisible(true);
+    }
+
+    @FXML
+    private void handleThemeButton(ActionEvent event) {
+        Button selectedButton = (Button) event.getSource();
+        selectedTheme = selectedButton.getText();
+
+        themePanel.setVisible(false);
+        questionPanel.setVisible(true);
+
+        generateQuestions(selectedTheme);
+    }
+
+    @FXML
+    private void handleNextButton(ActionEvent event) {
+        ToggleGroup answerGroup = answer1RadioButton.getToggleGroup();
+        RadioButton selectedRadioButton = (RadioButton) answerGroup.getSelectedToggle();
+        if (selectedRadioButton == null) {
+            // Mostrar una alerta indicando que no se ha seleccionado ninguna respuesta
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Advertencia");
+            alert.setHeaderText(null);
+            alert.setContentText("Por favor, selecciona una respuesta antes de continuar.");
+            alert.showAndWait();
+            return;
+        }
+
+        String selectedAnswer = selectedRadioButton.getText();
+        String correctAnswer = getCorrectAnswer();
+
+        if (selectedAnswer.equals(correctAnswer)) {
+            score += 15;
+        }
+
+        scoreLabel.setText("Puntaje: " + score + " " + usernameField.getText());
+
+        currentQuestionIndex++;
+        if (currentQuestionIndex < questionsByTheme.get(currentTheme).size()) {
+            String[] questionData = questionsByTheme.get(currentTheme).get(currentQuestionIndex);
+            questionLabel.setText(questionData[0]);
+            setAnswerOptions(questionData);
+            clearSelectedAnswer();
+        } else {
+            endGame();
+        }
+    }
+
+
+    @FXML
+    private void handleBackButton(ActionEvent event) {
+        questionPanel.setVisible(false);
+        themePanel.setVisible(true);
+    }
+
+    @FXML
+    private void handleExitButton(ActionEvent event) {
+        endGame();
+    }
+
+    private void generateQuestions(String theme) {
+        currentTheme = theme;
+        currentQuestionIndex = 0;
+
+        String[] questionData = questionsByTheme.get(currentTheme).get(currentQuestionIndex);
+        questionLabel.setText(questionData[0]);
+        setAnswerOptions(questionData);
+        clearSelectedAnswer();
+
+        score = 0;
+        scoreLabel.setText("Puntaje: " + score);
+    }
+
+    private void endGame() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Fin del juego");
+        alert.setHeaderText(null);
+        alert.setContentText("Juego terminado. Tu Puntaje " + usernameField.getText() + " es " + score + " ");
+        alert.showAndWait();
+
+        showCorrectAnswers();
+
+        System.exit(0);
+    }
+
+    private void clearSelectedAnswer() {
+        ToggleGroup answerGroup = answer1RadioButton.getToggleGroup();
+        answerGroup.selectToggle(null);
+    }
+
+    private String getCorrectAnswer() {
+        return questionsByTheme.get(currentTheme).get(currentQuestionIndex)[1];
+    }
+
+    private void setAnswerOptions(String[] questionData) {
+        answerOptions = new ArrayList<>();
+        answerOptions.add(questionData[1]); // Respuesta correcta
+
+        // Obtener respuestas incorrectas de la API de Google
+        try {
+            OkHttpClient client = new OkHttpClient();
+            String query = "Buscar respuestas incorrectas relacionadas con la pregunta";
+            String apiKey = "AIzaSyADGy4cKRbPnKFIOLTVJKEzH4c8fNB_Iuk";
+            String url = "https://www.googleapis.com/customsearch/v1?q=" + query + "&key=" + apiKey;
+
+            Request request = new Request.Builder()
+                    .url(url)
+                    .build();
+
+            Response response = client.newCall(request).execute();
+            String jsonData = response.body().string();
+
+            // Analizar la respuesta JSON de la API de Google
+            JsonParser parser = new JsonParser();
+            JsonObject jsonObject = parser.parse(jsonData).getAsJsonObject();
+
+            // Extraer las respuestas incorrectas de la respuesta JSON
+            JsonElement items = jsonObject.get("items");
+            if (items != null && items.isJsonArray()) {
+                JsonArray jsonArray = items.getAsJsonArray();
+                for (JsonElement item : jsonArray) {
+                    JsonObject itemObject = item.getAsJsonObject();
+                    String answer = itemObject.get("title").getAsString();
+                    answerOptions.add(answer);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Mezclar las opciones de respuesta (respuestas incorrectas + respuesta correcta)
+        Collections.shuffle(answerOptions);
+
+        // Establecer las opciones de respuesta en los botones de radio
+        answer1RadioButton.setText(answerOptions.get(0));
+        answer2RadioButton.setText(answerOptions.get(1));
+        answer3RadioButton.setText(answerOptions.get(2));
+        answer4RadioButton.setText(answerOptions.get(3));
+    }
+
+    private void showCorrectAnswers() {
+        for (int i = 0; i < questionsByTheme.get(currentTheme).size(); i++) {
+            String correctAnswer = questionsByTheme.get(currentTheme).get(i)[1];
+            RadioButton radioButton = (RadioButton) answer1RadioButton.getToggleGroup().getToggles().get(i);
+            radioButton.setText(correctAnswer);
+        }
+    }
+}
